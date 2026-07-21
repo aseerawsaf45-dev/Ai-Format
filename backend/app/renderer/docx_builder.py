@@ -185,6 +185,25 @@ def _render_paragraph(doc: DocxDocument, block: Paragraph, theme: Theme) -> None
 
 def _render_code_block(doc: DocxDocument, block: CodeBlock, theme: Theme) -> None:
     """Render a fenced code block: dark-bg paragraph with monospace text."""
+    if block.lang and block.lang.lower() == "mermaid":
+        try:
+            b64_code = base64.urlsafe_b64encode(block.code.encode('utf-8')).decode('utf-8')
+            req = urllib.request.Request(
+                f"https://mermaid.ink/img/{b64_code}",
+                headers={"User-Agent": "Mozilla/5.0"}
+            )
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                stream = BytesIO(resp.read())
+            doc.add_picture(stream, width=Inches(5))
+            
+            # Trailing spacer
+            spacer = doc.add_paragraph()
+            _set_para_spacing(spacer, before_pt=0, after_pt=8)
+            return
+        except Exception as e:
+            # Fallback to standard text rendering if the API fails
+            pass
+
     # Language label (if present).
     if block.lang:
         label_para = doc.add_paragraph()
@@ -326,7 +345,11 @@ def _render_image(doc: DocxDocument, block: Image, theme: Theme) -> None:
             doc.add_picture(stream, width=Inches(4))
         elif block.url:
             if block.url.startswith(("http://", "https://")):
-                with urllib.request.urlopen(block.url, timeout=5) as resp:
+                req = urllib.request.Request(
+                    block.url,
+                    headers={"User-Agent": "Mozilla/5.0"}
+                )
+                with urllib.request.urlopen(req, timeout=5) as resp:
                     stream = BytesIO(resp.read())
                 doc.add_picture(stream, width=Inches(4))
             # Skip local/relative URLs (can't resolve at render time)
