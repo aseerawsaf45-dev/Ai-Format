@@ -1,11 +1,14 @@
+import random
 import re
 import xml.etree.ElementTree as ET
+from xml.sax.saxutils import escape
 from docx.oxml import parse_xml
 
 EMU_PER_PIXEL = 9525  # standard 96 DPI conversion
 
 def _create_shape(shape_id, x, y, w, h, text, shape_type="rect", fill="F4F4F4"):
     """Generate a single wps:wsp WordprocessingShape."""
+    text = escape(text)
     # Convert pixels to EMU
     x_emu = int(x * EMU_PER_PIXEL)
     y_emu = int(y * EMU_PER_PIXEL)
@@ -107,6 +110,7 @@ def _parse_color(style_str, default="F4F4F4"):
     return default
 
 def _create_text_box(shape_id, x, y, text, font_size=12, align="center"):
+    text = escape(text)
     # Create a transparent shape with just text
     x_emu = int(x * EMU_PER_PIXEL)
     y_emu = int(y * EMU_PER_PIXEL)
@@ -280,6 +284,9 @@ def svg_to_drawingml(svg_string: str):
                     
     shapes_joined = "".join(shapes_xml)
     
+    doc_id = random.randint(10000, 99999)
+    grp_id = random.randint(10000, 99999)
+    
     xml = f'''
     <w:drawing xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
                xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
@@ -289,11 +296,12 @@ def svg_to_drawingml(svg_string: str):
       <wp:inline distT="0" distB="0" distL="0" distR="0">
         <wp:extent cx="{grp_w_emu}" cy="{grp_h_emu}"/>
         <wp:effectExtent l="0" t="0" r="0" b="0"/>
-        <wp:docPr id="1" name="Mermaid Diagram"/>
+        <wp:docPr id="{doc_id}" name="Mermaid Diagram {doc_id}"/>
         <wp:cNvGraphicFramePr/>
         <a:graphic>
           <a:graphicData uri="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup">
             <wpg:wgp>
+              <wpg:cNvPr id="{grp_id}" name="Group {grp_id}"/>
               <wpg:cNvGrpSpPr/>
               <wpg:grpSpPr>
                 <a:xfrm>
