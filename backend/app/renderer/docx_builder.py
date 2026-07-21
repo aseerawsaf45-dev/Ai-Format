@@ -190,7 +190,22 @@ def _render_code_block(doc: DocxDocument, block: CodeBlock, theme: Theme) -> Non
         try:
             b64_code = base64.urlsafe_b64encode(block.code.encode('utf-8')).decode('utf-8')
             
-            # Attempt to fetch and parse SVG into native DrawingML
+            # 1. Fetch and render PNG first
+            req_png = urllib.request.Request(
+                f"https://mermaid.ink/img/{b64_code}",
+                headers={"User-Agent": "Mozilla/5.0"}
+            )
+            with urllib.request.urlopen(req_png, timeout=10) as resp:
+                stream = BytesIO(resp.read())
+            
+            p = doc.add_paragraph()
+            r = p.add_run()
+            r.add_picture(stream, width=Inches(5))
+            
+            # Find the generated drawing element
+            png_drawing = r._r.find(".//{http://schemas.openxmlformats.org/wordprocessingml/2006/main}drawing")
+            
+            # 2. Attempt to fetch and parse SVG into native DrawingML
             try:
                 req_svg = urllib.request.Request(
                     f"https://mermaid.ink/svg/{b64_code}",
@@ -199,27 +214,36 @@ def _render_code_block(doc: DocxDocument, block: CodeBlock, theme: Theme) -> Non
                 with urllib.request.urlopen(req_svg, timeout=10) as resp_svg:
                     svg_str = resp_svg.read().decode('utf-8')
                 
-                drawing_xml = svg_to_drawingml(svg_str)
-                if drawing_xml is not None:
-                    # Successfully mapped to DrawingML
-                    p = doc.add_paragraph()
-                    p._p.append(drawing_xml)
+                vector_drawing = svg_to_drawingml(svg_str)
+                if vector_drawing is not None and png_drawing is not None:
+                    # Construct AlternateContent wrapper
+                    from docx.oxml import parse_xml
+                    mc_xml = '''
+                    <mc:AlternateContent xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+                        <mc:Choice Requires="wpg wps">
+                        </mc:Choice>
+                        <mc:Fallback>
+                        </mc:Fallback>
+                    </mc:AlternateContent>
+                    '''
+                    mc_elem = parse_xml(mc_xml)
                     
-                    spacer = doc.add_paragraph()
-                    _set_para_spacing(spacer, before_pt=0, after_pt=8)
-                    return
+                    choice = mc_elem.find(".//{http://schemas.openxmlformats.org/markup-compatibility/2006}Choice")
+                    fallback = mc_elem.find(".//{http://schemas.openxmlformats.org/markup-compatibility/2006}Fallback")
+                    
+                    # Insert the advanced vector drawing into the Choice block
+                    choice.append(vector_drawing)
+                    
+                    # Move the PNG drawing from the run into the Fallback block
+                    r._r.remove(png_drawing)
+                    fallback.append(png_drawing)
+                    
+                    # Append the AlternateContent wrapper to the run
+                    r._r.append(mc_elem)
+                    
             except Exception as svg_e:
-                print(f"DrawingML generation failed: {svg_e}, falling back to PNG")
+                print(f"DrawingML generation failed: {svg_e}, keeping PNG only")
 
-            # Fallback to PNG
-            req = urllib.request.Request(
-                f"https://mermaid.ink/img/{b64_code}",
-                headers={"User-Agent": "Mozilla/5.0"}
-            )
-            with urllib.request.urlopen(req, timeout=10) as resp:
-                stream = BytesIO(resp.read())
-            doc.add_picture(stream, width=Inches(5))
-            
             # Trailing spacer
             spacer = doc.add_paragraph()
             _set_para_spacing(spacer, before_pt=0, after_pt=8)
