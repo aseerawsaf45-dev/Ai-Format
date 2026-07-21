@@ -17,7 +17,7 @@ All visual choices (fonts, colours, spacing) are driven by :class:`Theme`.
 from __future__ import annotations
 
 import base64
-import io
+import random
 import urllib.request
 from io import BytesIO
 from typing import cast
@@ -212,7 +212,7 @@ def _render_code_block(doc: DocxDocument, block: CodeBlock, theme: Theme) -> Non
                 gen = DrawingMLGenerator(ast)
                 wpg_xml = gen.build_xml()
                 
-                # Wrap in drawing block
+                doc_pr_id = random.randint(100000, 2000000000)
                 drawing_xml = f'''
                 <w:drawing xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" 
                            xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" 
@@ -222,7 +222,7 @@ def _render_code_block(doc: DocxDocument, block: CodeBlock, theme: Theme) -> Non
                     <wp:inline distT="0" distB="0" distL="0" distR="0">
                         <wp:extent cx="{int(ast.width*9525)}" cy="{int(ast.height*9525)}"/>
                         <wp:effectExtent l="0" t="0" r="0" b="0"/>
-                        <wp:docPr id="1000" name="Editable Diagram"/>
+                        <wp:docPr id="{doc_pr_id}" name="Editable Diagram"/>
                         <wp:cNvGraphicFramePr/>
                         <a:graphic>
                             <a:graphicData uri="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup">
@@ -495,10 +495,14 @@ def render_document(document: Document, theme_name: str = "modern") -> bytes:
 
     # Ensure wpg and wps are in mc:Ignorable to prevent Word corruption
     mc_ignorable = doc.element.get("{http://schemas.openxmlformats.org/markup-compatibility/2006}Ignorable")
-    if mc_ignorable:
-        if "asvg" not in mc_ignorable:
-            mc_ignorable += " asvg"
-        doc.element.set("{http://schemas.openxmlformats.org/markup-compatibility/2006}Ignorable", mc_ignorable)
+    if mc_ignorable is not None:
+        if "wpg" not in mc_ignorable:
+            mc_ignorable += " wpg"
+        if "wps" not in mc_ignorable:
+            mc_ignorable += " wps"
+        doc.element.set("{http://schemas.openxmlformats.org/markup-compatibility/2006}Ignorable", mc_ignorable.strip())
+    else:
+        doc.element.set("{http://schemas.openxmlformats.org/markup-compatibility/2006}Ignorable", "wpg wps")
 
     # Page margins from theme.
     for section in doc.sections:

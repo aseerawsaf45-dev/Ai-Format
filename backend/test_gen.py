@@ -1,45 +1,44 @@
 import docx
-from docx.oxml import parse_xml
-from app.renderer.diagrams import fetch_svg_ast, parse_svg_to_ast
-from app.renderer.generator import DrawingMLGenerator
+from app.renderer.pipeline import DiagramPipeline
+from app.renderer.geometry.coord_translator import CoordTranslator
+from app.renderer.ooxml.package_builder import PackageBuilder
+from app.renderer.parsers.detector import detect_format
 
-doc = docx.Document()
-p = doc.add_paragraph()
-r = p.add_run()
+def main():
+    doc = docx.Document()
+    p = doc.add_paragraph()
+    r = p.add_run()
 
-mermaid_code = 'graph TD\n  A[Alice] --> B[Bob]'
-svg = fetch_svg_ast(mermaid_code)
-ast = parse_svg_to_ast(svg)
-gen = DrawingMLGenerator(ast)
-wpg_xml = gen.build_xml()
+    mermaid_code = '''
+    graph TD
+      A[Alice] --> B[Bob]
+      B --> C[Charlie]
+      C --> A
+    '''
+    
+    pipeline = DiagramPipeline()
+    
+    # Process Diagram (Parsing -> Layout -> DrawingML)
+    wpg_xml = pipeline.process(mermaid_code)
+    
+    # We also need to get dimensions to set wp:extent. 
+    # For now, let's extract it from the pipeline model. 
+    # Better architecture would be process() returning a tuple (xml, width, height) or a Result object.
+    
+    parser_cls = detect_format(mermaid_code)
+    parser = parser_cls()
+    model = parser.parse(mermaid_code)
+    pipeline.text_engine.compute_node_dimensions(model)
+    pipeline.layout_engine.compute_layout(model)
+    
+    width_emu = CoordTranslator.pt_to_emu(model.width)
+    height_emu = CoordTranslator.pt_to_emu(model.height)
+    
+    PackageBuilder.inject_drawingml_into_run(r, wpg_xml, width_emu, height_emu)
+    PackageBuilder.ensure_namespaces(doc)
+    
+    doc.save('test_generator_new.docx')
+    print('Generated test_generator_new.docx successfully!')
 
-drawing_xml = f'''
-<w:drawing xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" 
-           xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" 
-           xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" 
-           xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup" 
-           xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape">
-    <wp:inline distT="0" distB="0" distL="0" distR="0">
-        <wp:extent cx="{int(ast.width*9525)}" cy="{int(ast.height*9525)}"/>
-        <wp:effectExtent l="0" t="0" r="0" b="0"/>
-        <wp:docPr id="1" name="Diagram"/>
-        <wp:cNvGraphicFramePr/>
-        <a:graphic>
-            <a:graphicData uri="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup">
-                {wpg_xml}
-            </a:graphicData>
-        </a:graphic>
-    </wp:inline>
-</w:drawing>
-'''
-
-r._r.append(parse_xml(drawing_xml))
-
-mc_ignorable = doc.element.get('{http://schemas.openxmlformats.org/markup-compatibility/2006}Ignorable')
-if mc_ignorable:
-    if 'wpg' not in mc_ignorable: mc_ignorable += ' wpg'
-    if 'wps' not in mc_ignorable: mc_ignorable += ' wps'
-    doc.element.set('{http://schemas.openxmlformats.org/markup-compatibility/2006}Ignorable', mc_ignorable)
-
-doc.save('test_generator.docx')
-print('Generated test_generator.docx')
+if __name__ == '__main__':
+    main()

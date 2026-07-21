@@ -1,3 +1,4 @@
+import random
 from typing import List
 from lxml import etree as ET
 
@@ -5,7 +6,7 @@ class DrawingMLGenerator:
     def __init__(self, ast):
         self.ast = ast
         self.emu_per_pixel = 9525
-        self.shape_id_counter = 1000
+        self.shape_id_counter = random.randint(100000, 2000000000)
 
     def get_next_id(self):
         self.shape_id_counter += 1
@@ -112,13 +113,11 @@ class DrawingMLGenerator:
         # and let Word compute the line. 
         # Actually Word will snap it to the edge if we provide stCxn.
         
+        # WordprocessingGroup does not fully support routed connectors. 
+        # Using wps:cNvCnPr inside wpg:wgp causes Word to report unreadable content.
+        # We must use standard wps:cNvSpPr for the line.
         cxn_xml = f'''
-            <wps:cNvCnPr>
-                <a:cxnSpPr>
-                    <a:stCxn id="{source_shape_id}" idx="3"/>
-                    <a:endCxn id="{target_shape_id}" idx="1"/>
-                </a:cxnSpPr>
-            </wps:cNvCnPr>
+            <wps:cNvSpPr/>
         '''
         
         # A bent connector
