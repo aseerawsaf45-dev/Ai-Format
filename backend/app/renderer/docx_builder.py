@@ -480,6 +480,15 @@ def render_document(document: Document, theme_name: str = "modern") -> bytes:
     theme = get_theme(theme_name)
     doc = DocxDocument()
 
+    # Ensure wpg and wps are in mc:Ignorable to prevent Word corruption
+    mc_ignorable = doc.element.get("{http://schemas.openxmlformats.org/markup-compatibility/2006}Ignorable")
+    if mc_ignorable:
+        if "wpg" not in mc_ignorable:
+            mc_ignorable += " wpg"
+        if "wps" not in mc_ignorable:
+            mc_ignorable += " wps"
+        doc.element.set("{http://schemas.openxmlformats.org/markup-compatibility/2006}Ignorable", mc_ignorable)
+
     # Page margins from theme.
     for section in doc.sections:
         m = Inches(theme.margin_inches)
