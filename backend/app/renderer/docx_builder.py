@@ -44,7 +44,6 @@ from app.models import (
     Table,
     ThematicBreak,
 )
-from app.renderer.drawingml import svg_to_drawingml
 from app.themes import Theme, get_theme
 
 
@@ -190,7 +189,7 @@ def _render_code_block(doc: DocxDocument, block: CodeBlock, theme: Theme) -> Non
         try:
             b64_code = base64.urlsafe_b64encode(block.code.encode('utf-8')).decode('utf-8')
             
-            # 1. Fetch and render PNG first
+            # 1. Fetch PNG fallback and render standard Word drawing
             req_png = urllib.request.Request(
                 f"https://mermaid.ink/img/{b64_code}",
                 headers={"User-Agent": "Mozilla/5.0"}
@@ -202,47 +201,37 @@ def _render_code_block(doc: DocxDocument, block: CodeBlock, theme: Theme) -> Non
             r = p.add_run()
             r.add_picture(stream, width=Inches(5))
             
-            # Find the generated drawing element
-            png_drawing = r._r.find(".//{http://schemas.openxmlformats.org/wordprocessingml/2006/main}drawing")
-            
-            # 2. Attempt to fetch and parse SVG into native DrawingML
+            # 2. Add SVG Native Vector Support via asvg:svgBlip extension
             try:
                 req_svg = urllib.request.Request(
                     f"https://mermaid.ink/svg/{b64_code}",
                     headers={"User-Agent": "Mozilla/5.0"}
                 )
                 with urllib.request.urlopen(req_svg, timeout=10) as resp_svg:
-                    svg_str = resp_svg.read().decode('utf-8')
-                
-                vector_drawing = svg_to_drawingml(svg_str)
-                if vector_drawing is not None and png_drawing is not None:
-                    # Construct AlternateContent wrapper
-                    from docx.oxml import parse_xml
-                    mc_xml = '''
-                    <mc:AlternateContent xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
-                        <mc:Choice Requires="wpg wps">
-                        </mc:Choice>
-                        <mc:Fallback>
-                        </mc:Fallback>
-                    </mc:AlternateContent>
-                    '''
-                    mc_elem = parse_xml(mc_xml)
-                    
-                    choice = mc_elem.find(".//{http://schemas.openxmlformats.org/markup-compatibility/2006}Choice")
-                    fallback = mc_elem.find(".//{http://schemas.openxmlformats.org/markup-compatibility/2006}Fallback")
-                    
-                    # Insert the advanced vector drawing into the Choice block
-                    choice.append(vector_drawing)
-                    
-                    # Move the PNG drawing from the run into the Fallback block
-                    r._r.remove(png_drawing)
-                    fallback.append(png_drawing)
-                    
-                    # Append the AlternateContent wrapper to the run
-                    r._r.append(mc_elem)
-                    
+                    svg_bytes = resp_svg.read()
+
+                # Add SVG file to the DOCX ZIP Package
+                from docx.opc.part import Part
+                svg_partname = doc.part.package.next_partname('/word/media/image%d.svg')
+                svg_part = Part(svg_partname, 'image/svg+xml', svg_bytes, doc.part.package)
+                rId_svg = doc.part.relate_to(svg_part, 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image')
+
+                # Inject <a:extLst> with SVG Blip into the existing image's <a:blip>
+                blip = r._r.find('.//{http://schemas.openxmlformats.org/drawingml/2006/main}blip')
+                from docx.oxml import parse_xml
+                ext_xml = f'''
+                <a:extLst xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
+                    <a:ext uri="{{96DAC541-7B7A-43D3-8B79-37D633B846F1}}">
+                        <asvg:svgBlip xmlns:asvg="http://schemas.microsoft.com/office/drawing/2016/SVG/main" 
+                                      xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" 
+                                      r:embed="{rId_svg}"/>
+                    </a:ext>
+                </a:extLst>
+                '''
+                extLst = parse_xml(ext_xml)
+                blip.append(extLst)
             except Exception as svg_e:
-                print(f"DrawingML generation failed: {svg_e}, keeping PNG only")
+                print(f"SVG vector embedding failed: {svg_e}")
 
             # Trailing spacer
             spacer = doc.add_paragraph()
@@ -483,10 +472,8 @@ def render_document(document: Document, theme_name: str = "modern") -> bytes:
     # Ensure wpg and wps are in mc:Ignorable to prevent Word corruption
     mc_ignorable = doc.element.get("{http://schemas.openxmlformats.org/markup-compatibility/2006}Ignorable")
     if mc_ignorable:
-        if "wpg" not in mc_ignorable:
-            mc_ignorable += " wpg"
-        if "wps" not in mc_ignorable:
-            mc_ignorable += " wps"
+        if "asvg" not in mc_ignorable:
+            mc_ignorable += " asvg"
         doc.element.set("{http://schemas.openxmlformats.org/markup-compatibility/2006}Ignorable", mc_ignorable)
 
     # Page margins from theme.
