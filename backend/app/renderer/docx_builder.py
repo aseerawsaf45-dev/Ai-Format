@@ -44,6 +44,7 @@ from app.models import (
     Table,
     ThematicBreak,
 )
+from app.renderer.drawingml import svg_to_drawingml
 from app.themes import Theme, get_theme
 
 
@@ -188,6 +189,29 @@ def _render_code_block(doc: DocxDocument, block: CodeBlock, theme: Theme) -> Non
     if block.lang and block.lang.lower() == "mermaid":
         try:
             b64_code = base64.urlsafe_b64encode(block.code.encode('utf-8')).decode('utf-8')
+            
+            # Attempt to fetch and parse SVG into native DrawingML
+            try:
+                req_svg = urllib.request.Request(
+                    f"https://mermaid.ink/svg/{b64_code}",
+                    headers={"User-Agent": "Mozilla/5.0"}
+                )
+                with urllib.request.urlopen(req_svg, timeout=10) as resp_svg:
+                    svg_str = resp_svg.read().decode('utf-8')
+                
+                drawing_xml = svg_to_drawingml(svg_str)
+                if drawing_xml is not None:
+                    # Successfully mapped to DrawingML
+                    p = doc.add_paragraph()
+                    p._p.append(drawing_xml)
+                    
+                    spacer = doc.add_paragraph()
+                    _set_para_spacing(spacer, before_pt=0, after_pt=8)
+                    return
+            except Exception as svg_e:
+                print(f"DrawingML generation failed: {svg_e}, falling back to PNG")
+
+            # Fallback to PNG
             req = urllib.request.Request(
                 f"https://mermaid.ink/img/{b64_code}",
                 headers={"User-Agent": "Mozilla/5.0"}
@@ -203,6 +227,7 @@ def _render_code_block(doc: DocxDocument, block: CodeBlock, theme: Theme) -> Non
         except Exception as e:
             # Fallback to standard text rendering if the API fails
             pass
+
 
     # Language label (if present).
     if block.lang:
