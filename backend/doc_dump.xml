@@ -1,0 +1,397 @@
+<?xml version="1.0" ?>
+<w:document xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas" xmlns:mo="http://schemas.microsoft.com/office/mac/office/2008/main" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:mv="urn:schemas-microsoft-com:mac:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp14="http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml" xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup" xmlns:wpi="http://schemas.microsoft.com/office/word/2010/wordprocessingInk" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml" xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape" mc:Ignorable="w14 wp14">
+	<w:body>
+		<w:p>
+			<w:drawing xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
+				<wp:inline distT="0" distB="0" distL="0" distR="0">
+					<wp:extent cx="4286250" cy="2466975"/>
+					<wp:effectExtent l="0" t="0" r="0" b="0"/>
+					<wp:docPr id="1" name="Mermaid Diagram"/>
+					<wp:cNvGraphicFramePr/>
+					<a:graphic>
+						<a:graphicData uri="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup">
+							<wpg:wgp>
+								<wpg:cNvGrpSpPr/>
+								<wpg:grpSpPr>
+									<a:xfrm>
+										<a:off x="0" y="0"/>
+										<a:ext cx="4286250" cy="2466975"/>
+										<a:chOff x="0" y="0"/>
+										<a:chExt cx="4286250" cy="2466975"/>
+									</a:xfrm>
+								</wpg:grpSpPr>
+								<wps:wsp>
+									<wps:cNvPr id="100" name="Shape 100"/>
+									<wps:cNvSpPr/>
+									<wps:spPr>
+										<a:xfrm>
+											<a:off x="1905000" y="1647825"/>
+											<a:ext cx="1428750" cy="619125"/>
+										</a:xfrm>
+										<a:prstGeom prst="rect">
+											<a:avLst/>
+										</a:prstGeom>
+										<a:solidFill>
+											<a:srgbClr val="FFFFFF"/>
+										</a:solidFill>
+										<a:ln w="12700">
+											<a:solidFill>
+												<a:srgbClr val="000000"/>
+											</a:solidFill>
+										</a:ln>
+									</wps:spPr>
+									<wps:txbx>
+										<w:txbxContent>
+											<w:p>
+												<w:pPr>
+													<w:jc w:val="center"/>
+												</w:pPr>
+												<w:r>
+													<w:rPr>
+														<w:sz w:val="20"/>
+														<w:color w:val="000000"/>
+													</w:rPr>
+													<w:t/>
+												</w:r>
+											</w:p>
+										</w:txbxContent>
+									</wps:txbx>
+								</wps:wsp>
+								<wps:wsp>
+									<wps:cNvPr id="101" name="Shape 101"/>
+									<wps:cNvSpPr/>
+									<wps:spPr>
+										<a:xfrm>
+											<a:off x="0" y="1647825"/>
+											<a:ext cx="1428750" cy="619125"/>
+										</a:xfrm>
+										<a:prstGeom prst="rect">
+											<a:avLst/>
+										</a:prstGeom>
+										<a:solidFill>
+											<a:srgbClr val="FFFFFF"/>
+										</a:solidFill>
+										<a:ln w="12700">
+											<a:solidFill>
+												<a:srgbClr val="000000"/>
+											</a:solidFill>
+										</a:ln>
+									</wps:spPr>
+									<wps:txbx>
+										<w:txbxContent>
+											<w:p>
+												<w:pPr>
+													<w:jc w:val="center"/>
+												</w:pPr>
+												<w:r>
+													<w:rPr>
+														<w:sz w:val="20"/>
+														<w:color w:val="000000"/>
+													</w:rPr>
+													<w:t/>
+												</w:r>
+											</w:p>
+										</w:txbxContent>
+									</wps:txbx>
+								</wps:wsp>
+								<wps:wsp>
+									<wps:cNvPr id="102" name="Line 102"/>
+									<wps:cNvSpPr/>
+									<wps:spPr>
+										<a:xfrm>
+											<a:off x="2619375" y="619125"/>
+											<a:ext cx="9525" cy="1028700"/>
+										</a:xfrm>
+										<a:prstGeom prst="line">
+											<a:avLst/>
+										</a:prstGeom>
+										<a:ln w="12700">
+											<a:solidFill>
+												<a:srgbClr val="000000"/>
+											</a:solidFill>
+											<a:headEnd type="none"/>
+											<a:tailEnd type="triangle"/>
+										</a:ln>
+									</wps:spPr>
+								</wps:wsp>
+								<wps:wsp>
+									<wps:cNvPr id="103" name="Shape 103"/>
+									<wps:cNvSpPr/>
+									<wps:spPr>
+										<a:xfrm>
+											<a:off x="1905000" y="0"/>
+											<a:ext cx="1428750" cy="619125"/>
+										</a:xfrm>
+										<a:prstGeom prst="rect">
+											<a:avLst/>
+										</a:prstGeom>
+										<a:solidFill>
+											<a:srgbClr val="FFFFFF"/>
+										</a:solidFill>
+										<a:ln w="12700">
+											<a:solidFill>
+												<a:srgbClr val="000000"/>
+											</a:solidFill>
+										</a:ln>
+									</wps:spPr>
+									<wps:txbx>
+										<w:txbxContent>
+											<w:p>
+												<w:pPr>
+													<w:jc w:val="center"/>
+												</w:pPr>
+												<w:r>
+													<w:rPr>
+														<w:sz w:val="20"/>
+														<w:color w:val="000000"/>
+													</w:rPr>
+													<w:t/>
+												</w:r>
+											</w:p>
+										</w:txbxContent>
+									</wps:txbx>
+								</wps:wsp>
+								<wps:wsp>
+									<wps:cNvPr id="104" name="Line 104"/>
+									<wps:cNvSpPr/>
+									<wps:spPr>
+										<a:xfrm>
+											<a:off x="714375" y="619125"/>
+											<a:ext cx="9525" cy="1028700"/>
+										</a:xfrm>
+										<a:prstGeom prst="line">
+											<a:avLst/>
+										</a:prstGeom>
+										<a:ln w="12700">
+											<a:solidFill>
+												<a:srgbClr val="000000"/>
+											</a:solidFill>
+											<a:headEnd type="none"/>
+											<a:tailEnd type="triangle"/>
+										</a:ln>
+									</wps:spPr>
+								</wps:wsp>
+								<wps:wsp>
+									<wps:cNvPr id="105" name="Shape 105"/>
+									<wps:cNvSpPr/>
+									<wps:spPr>
+										<a:xfrm>
+											<a:off x="0" y="0"/>
+											<a:ext cx="1428750" cy="619125"/>
+										</a:xfrm>
+										<a:prstGeom prst="rect">
+											<a:avLst/>
+										</a:prstGeom>
+										<a:solidFill>
+											<a:srgbClr val="FFFFFF"/>
+										</a:solidFill>
+										<a:ln w="12700">
+											<a:solidFill>
+												<a:srgbClr val="000000"/>
+											</a:solidFill>
+										</a:ln>
+									</wps:spPr>
+									<wps:txbx>
+										<w:txbxContent>
+											<w:p>
+												<w:pPr>
+													<w:jc w:val="center"/>
+												</w:pPr>
+												<w:r>
+													<w:rPr>
+														<w:sz w:val="20"/>
+														<w:color w:val="000000"/>
+													</w:rPr>
+													<w:t/>
+												</w:r>
+											</w:p>
+										</w:txbxContent>
+									</wps:txbx>
+								</wps:wsp>
+								<wps:wsp>
+									<wps:cNvPr id="106" name="Shape 106"/>
+									<wps:cNvSpPr/>
+									<wps:spPr>
+										<a:xfrm>
+											<a:off x="85725" y="85725"/>
+											<a:ext cx="114300" cy="114300"/>
+										</a:xfrm>
+										<a:prstGeom prst="ellipse">
+											<a:avLst/>
+										</a:prstGeom>
+										<a:solidFill>
+											<a:srgbClr val="F4F4F4"/>
+										</a:solidFill>
+										<a:ln w="12700">
+											<a:solidFill>
+												<a:srgbClr val="000000"/>
+											</a:solidFill>
+										</a:ln>
+									</wps:spPr>
+									<wps:txbx>
+										<w:txbxContent>
+											<w:p>
+												<w:pPr>
+													<w:jc w:val="center"/>
+												</w:pPr>
+												<w:r>
+													<w:rPr>
+														<w:sz w:val="20"/>
+														<w:color w:val="000000"/>
+													</w:rPr>
+													<w:t/>
+												</w:r>
+											</w:p>
+										</w:txbxContent>
+									</wps:txbx>
+								</wps:wsp>
+								<wps:wsp>
+									<wps:cNvPr id="107" name="Shape 107"/>
+									<wps:cNvSpPr/>
+									<wps:spPr>
+										<a:xfrm>
+											<a:off x="2571750" y="1038225"/>
+											<a:ext cx="95250" cy="419100"/>
+										</a:xfrm>
+										<a:prstGeom prst="rect">
+											<a:avLst/>
+										</a:prstGeom>
+										<a:solidFill>
+											<a:srgbClr val="F4F4F4"/>
+										</a:solidFill>
+										<a:ln w="12700">
+											<a:solidFill>
+												<a:srgbClr val="000000"/>
+											</a:solidFill>
+										</a:ln>
+									</wps:spPr>
+									<wps:txbx>
+										<w:txbxContent>
+											<w:p>
+												<w:pPr>
+													<w:jc w:val="center"/>
+												</w:pPr>
+												<w:r>
+													<w:rPr>
+														<w:sz w:val="20"/>
+														<w:color w:val="000000"/>
+													</w:rPr>
+													<w:t/>
+												</w:r>
+											</w:p>
+										</w:txbxContent>
+									</wps:txbx>
+								</wps:wsp>
+								<wps:wsp>
+									<wps:cNvPr id="108" name="Text 108"/>
+									<wps:cNvSpPr txBox="1"/>
+									<wps:spPr>
+										<a:xfrm>
+											<a:off x="1447800" y="647700"/>
+											<a:ext cx="342900" cy="171450"/>
+										</a:xfrm>
+										<a:prstGeom prst="rect">
+											<a:avLst/>
+										</a:prstGeom>
+										<a:noFill/>
+										<a:ln>
+											<a:noFill/>
+										</a:ln>
+									</wps:spPr>
+									<wps:txbx>
+										<w:txbxContent>
+											<w:p>
+												<w:pPr>
+													<w:jc w:val="center"/>
+												</w:pPr>
+												<w:r>
+													<w:t>Hello</w:t>
+												</w:r>
+											</w:p>
+										</w:txbxContent>
+									</wps:txbx>
+								</wps:wsp>
+								<wps:wsp>
+									<wps:cNvPr id="109" name="Line 109"/>
+									<wps:cNvSpPr/>
+									<wps:spPr>
+										<a:xfrm>
+											<a:off x="723900" y="1038225"/>
+											<a:ext cx="1819275" cy="9525"/>
+										</a:xfrm>
+										<a:prstGeom prst="line">
+											<a:avLst/>
+										</a:prstGeom>
+										<a:ln w="12700">
+											<a:solidFill>
+												<a:srgbClr val="000000"/>
+											</a:solidFill>
+											<a:headEnd type="none"/>
+											<a:tailEnd type="triangle"/>
+										</a:ln>
+									</wps:spPr>
+								</wps:wsp>
+								<wps:wsp>
+									<wps:cNvPr id="110" name="Text 110"/>
+									<wps:cNvSpPr txBox="1"/>
+									<wps:spPr>
+										<a:xfrm>
+											<a:off x="1476375" y="1066800"/>
+											<a:ext cx="137160" cy="171450"/>
+										</a:xfrm>
+										<a:prstGeom prst="rect">
+											<a:avLst/>
+										</a:prstGeom>
+										<a:noFill/>
+										<a:ln>
+											<a:noFill/>
+										</a:ln>
+									</wps:spPr>
+									<wps:txbx>
+										<w:txbxContent>
+											<w:p>
+												<w:pPr>
+													<w:jc w:val="center"/>
+												</w:pPr>
+												<w:r>
+													<w:t>Hi</w:t>
+												</w:r>
+											</w:p>
+										</w:txbxContent>
+									</wps:txbx>
+								</wps:wsp>
+								<wps:wsp>
+									<wps:cNvPr id="111" name="Line 111"/>
+									<wps:cNvSpPr/>
+									<wps:spPr>
+										<a:xfrm>
+											<a:off x="752475" y="1457325"/>
+											<a:ext cx="1819275" cy="9525"/>
+										</a:xfrm>
+										<a:prstGeom prst="line">
+											<a:avLst/>
+										</a:prstGeom>
+										<a:ln w="12700">
+											<a:solidFill>
+												<a:srgbClr val="000000"/>
+											</a:solidFill>
+											<a:prstDash val="dash"/>
+											<a:headEnd type="none"/>
+											<a:tailEnd type="triangle"/>
+										</a:ln>
+									</wps:spPr>
+								</wps:wsp>
+							</wpg:wgp>
+						</a:graphicData>
+					</a:graphic>
+				</wp:inline>
+			</w:drawing>
+		</w:p>
+		<w:sectPr w:rsidR="00FC693F" w:rsidRPr="0006063C" w:rsidSect="00034616">
+			<w:pgSz w:w="12240" w:h="15840"/>
+			<w:pgMar w:top="1440" w:right="1800" w:bottom="1440" w:left="1800" w:header="720" w:footer="720" w:gutter="0"/>
+			<w:cols w:space="720"/>
+			<w:docGrid w:linePitch="360"/>
+		</w:sectPr>
+	</w:body>
+</w:document>

@@ -200,38 +200,62 @@ def _render_code_block(doc: DocxDocument, block: CodeBlock, theme: Theme) -> Non
             p = doc.add_paragraph()
             r = p.add_run()
             r.add_picture(stream, width=Inches(5))
+            png_drawing = r._r.find(".//{http://schemas.openxmlformats.org/wordprocessingml/2006/main}drawing")
             
-            # 2. Add SVG Native Vector Support via asvg:svgBlip extension
+            # 2. Add Native Editable Vector Support via AST & DrawingML Generator
             try:
-                req_svg = urllib.request.Request(
-                    f"https://mermaid.ink/svg/{b64_code}",
-                    headers={"User-Agent": "Mozilla/5.0"}
-                )
-                with urllib.request.urlopen(req_svg, timeout=10) as resp_svg:
-                    svg_bytes = resp_svg.read()
-
-                # Add SVG file to the DOCX ZIP Package
-                from docx.opc.part import Part
-                svg_partname = doc.part.package.next_partname('/word/media/image%d.svg')
-                svg_part = Part(svg_partname, 'image/svg+xml', svg_bytes, doc.part.package)
-                rId_svg = doc.part.relate_to(svg_part, 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image')
-
-                # Inject <a:extLst> with SVG Blip into the existing image's <a:blip>
-                blip = r._r.find('.//{http://schemas.openxmlformats.org/drawingml/2006/main}blip')
-                from docx.oxml import parse_xml
-                ext_xml = f'''
-                <a:extLst xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
-                    <a:ext uri="{{96DAC541-7B7A-43D3-8B79-37D633B846F1}}">
-                        <asvg:svgBlip xmlns:asvg="http://schemas.microsoft.com/office/drawing/2016/SVG/main" 
-                                      xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" 
-                                      r:embed="{rId_svg}"/>
-                    </a:ext>
-                </a:extLst>
+                from app.renderer.diagrams import fetch_svg_ast, parse_svg_to_ast
+                from app.renderer.generator import DrawingMLGenerator
+                
+                svg_str = fetch_svg_ast(block.code)
+                ast = parse_svg_to_ast(svg_str)
+                gen = DrawingMLGenerator(ast)
+                wpg_xml = gen.build_xml()
+                
+                # Wrap in drawing block
+                drawing_xml = f'''
+                <w:drawing xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" 
+                           xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" 
+                           xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" 
+                           xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup" 
+                           xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape">
+                    <wp:inline distT="0" distB="0" distL="0" distR="0">
+                        <wp:extent cx="{int(ast.width*9525)}" cy="{int(ast.height*9525)}"/>
+                        <wp:effectExtent l="0" t="0" r="0" b="0"/>
+                        <wp:docPr id="1000" name="Editable Diagram"/>
+                        <wp:cNvGraphicFramePr/>
+                        <a:graphic>
+                            <a:graphicData uri="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup">
+                                {wpg_xml}
+                            </a:graphicData>
+                        </a:graphic>
+                    </wp:inline>
+                </w:drawing>
                 '''
-                extLst = parse_xml(ext_xml)
-                blip.append(extLst)
-            except Exception as svg_e:
-                print(f"SVG vector embedding failed: {svg_e}")
+                
+                from docx.oxml import parse_xml
+                vector_drawing = parse_xml(drawing_xml)
+                
+                if vector_drawing is not None and png_drawing is not None:
+                    mc_xml = '''
+                    <mc:AlternateContent xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+                        <mc:Choice Requires="wpg wps">
+                        </mc:Choice>
+                        <mc:Fallback>
+                        </mc:Fallback>
+                    </mc:AlternateContent>
+                    '''
+                    mc_elem = parse_xml(mc_xml)
+                    
+                    choice = mc_elem.find(".//{http://schemas.openxmlformats.org/markup-compatibility/2006}Choice")
+                    fallback = mc_elem.find(".//{http://schemas.openxmlformats.org/markup-compatibility/2006}Fallback")
+                    
+                    choice.append(vector_drawing)
+                    r._r.remove(png_drawing)
+                    fallback.append(png_drawing)
+                    r._r.append(mc_elem)
+            except Exception as e:
+                print(f"Native Diagram generation failed: {e}")
 
             # Trailing spacer
             spacer = doc.add_paragraph()
