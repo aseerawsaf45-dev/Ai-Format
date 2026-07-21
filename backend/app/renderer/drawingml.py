@@ -54,6 +54,7 @@ def _create_shape(shape_id, x, y, w, h, text, shape_type="rect", fill="F4F4F4"):
                 </w:p>
             </w:txbxContent>
         </wps:txbx>
+        <wps:bodyPr/>
     </wps:wsp>
     '''
     return xml
@@ -141,6 +142,7 @@ def _create_text_box(shape_id, x, y, text, font_size=12, align="center"):
                 </w:p>
             </w:txbxContent>
         </wps:txbx>
+        <wps:bodyPr/>
     </wps:wsp>
     '''
     return xml
@@ -176,6 +178,7 @@ def _create_line(shape_id, x1, y1, x2, y2, dashed=False):
                 <a:tailEnd type="triangle"/>
             </a:ln>
         </wps:spPr>
+        <wps:bodyPr/>
     </wps:wsp>
     '''
     return xml
